@@ -1,0 +1,1116 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
+
+<title>MEGA AI 1.0</title>
+
+<style>
+
+/* =========================
+   ASOSIY DIZAYN
+========================= */
+
+*{
+    box-sizing:border-box;
+}
+
+body{
+    margin:0;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
+    background:#f5f9fc;
+    color:#18212b;
+}
+
+/* =========================
+   HEADER
+========================= */
+
+header{
+    height:64px;
+    background:rgba(255,255,255,.94);
+    border-bottom:1px solid #dfe8ef;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:0 22px;
+    position:sticky;
+    top:0;
+    z-index:20;
+    backdrop-filter:blur(12px);
+}
+
+.logo{
+    font-size:23px;
+    font-weight:700;
+    letter-spacing:-.5px;
+}
+
+.logo span{
+    color:#4b8fc9;
+}
+
+.version{
+    font-size:12px;
+    color:#718395;
+    background:#edf5fa;
+    padding:7px 12px;
+    border-radius:20px;
+}
+
+/* =========================
+   CONTAINER
+========================= */
+
+.container{
+    width:min(1050px,100%);
+    margin:auto;
+    padding:16px;
+}
+
+/* =========================
+   TABS
+========================= */
+
+.tabs{
+    display:flex;
+    gap:7px;
+    overflow-x:auto;
+    padding-bottom:7px;
+}
+
+.tabs::-webkit-scrollbar{
+    display:none;
+}
+
+.tabs button{
+    border:1px solid #dce6ed;
+    background:#ffffff;
+    color:#506171;
+    padding:10px 14px;
+    border-radius:11px;
+    font-size:14px;
+    white-space:nowrap;
+    cursor:pointer;
+    transition:.2s;
+}
+
+.tabs button:hover{
+    background:#f0f6fa;
+}
+
+.tabs button.active{
+    background:#e5f2fb;
+    border-color:#bcd9ed;
+    color:#3477a8;
+}
+
+/* =========================
+   PANELS
+========================= */
+
+.panel{
+    display:none;
+}
+
+.panel.active{
+    display:block;
+}
+
+/* =========================
+   CARD
+========================= */
+
+.card{
+    background:#ffffff;
+    border:1px solid #e0e8ee;
+    border-radius:17px;
+    padding:18px;
+    box-shadow:0 3px 15px rgba(52,82,105,.05);
+}
+
+h2{
+    margin:0 0 14px;
+    font-size:20px;
+    font-weight:650;
+}
+
+/* =========================
+   CHAT
+========================= */
+
+#messages{
+    height:470px;
+    overflow-y:auto;
+    padding:20px 10px;
+    position:relative;
+
+    background:
+        linear-gradient(
+            rgba(247,251,253,.92),
+            rgba(247,251,253,.92)
+        ),
+        radial-gradient(
+            circle at center,
+            #d9edf9 0,
+            #f7fbfd 55%
+        );
+
+    border-radius:15px;
+
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+
+    margin-bottom:12px;
+}
+
+/*
+   MEGA 1.0 WATERMARK
+*/
+
+#messages::before{
+    content:"MEGA 1.0";
+    position:absolute;
+    inset:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    font-size:62px;
+    font-weight:800;
+    letter-spacing:4px;
+
+    color:rgba(65,139,190,.075);
+
+    pointer-events:none;
+    user-select:none;
+}
+
+.message{
+    max-width:82%;
+    padding:12px 15px;
+    border-radius:16px;
+    line-height:1.5;
+    white-space:pre-wrap;
+    position:relative;
+    z-index:1;
+}
+
+.message.ai{
+    align-self:flex-start;
+    background:#ffffff;
+    border:1px solid #e0e8ee;
+    box-shadow:0 2px 7px rgba(50,80,100,.04);
+}
+
+.message.user{
+    align-self:flex-end;
+    background:#dceefa;
+    color:#193c54;
+    border:1px solid #c5e1f1;
+}
+
+/* =========================
+   CHAT INPUT
+========================= */
+
+.chatbox{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    background:#ffffff;
+    border:1px solid #dce5eb;
+    border-radius:15px;
+    padding:6px;
+}
+
+.chatbox input{
+    flex:1;
+    border:0;
+    outline:none;
+    background:transparent;
+    padding:11px;
+    color:#26333e;
+    font-size:15px;
+}
+
+.chatbox input::placeholder{
+    color:#9aa9b5;
+}
+
+.send{
+    border:0;
+    background:#dceefa;
+    color:#3279a9;
+    width:42px;
+    height:42px;
+    border-radius:12px;
+    cursor:pointer;
+    font-size:18px;
+}
+
+/* =========================
+   BUTTONS
+========================= */
+
+.primary{
+    background:#dceefa;
+    color:#3479a8;
+    border:1px solid #c4dfef;
+    padding:10px 15px;
+    border-radius:11px;
+    cursor:pointer;
+    font-size:14px;
+}
+
+.primary:hover{
+    background:#cfe8f6;
+}
+
+.secondary{
+    background:#f4f8fa;
+    color:#637582;
+    border:1px solid #dce5eb;
+    padding:9px 13px;
+    border-radius:10px;
+    cursor:pointer;
+}
+
+.quick{
+    margin-top:12px;
+    display:flex;
+    flex-wrap:wrap;
+    gap:7px;
+}
+
+/* =========================
+   INPUTS
+========================= */
+
+textarea,
+input[type="text"],
+input[type="file"]{
+    width:100%;
+    background:#f9fbfc;
+    border:1px solid #dce5eb;
+    color:#26333e;
+    border-radius:12px;
+    padding:12px;
+    outline:none;
+}
+
+textarea{
+    min-height:130px;
+    resize:vertical;
+}
+
+textarea:focus,
+input:focus{
+    border-color:#a9cee3;
+    box-shadow:0 0 0 3px rgba(116,178,216,.12);
+}
+
+/* =========================
+   CODE
+========================= */
+
+pre{
+    background:#f4f8fa;
+    color:#344b5a;
+    border:1px solid #dce5eb;
+    border-radius:12px;
+    padding:15px;
+    overflow:auto;
+    white-space:pre-wrap;
+    line-height:1.5;
+}
+
+/* =========================
+   STATUS
+========================= */
+
+.status{
+    color:#758896;
+    font-size:14px;
+    margin-top:12px;
+}
+
+/* =========================
+   FOOTER
+========================= */
+
+footer{
+    text-align:center;
+    color:#9aa9b4;
+    padding:18px;
+    font-size:12px;
+}
+
+</style>
+</head>
+
+
+<body>
+
+<header>
+
+    <div class="logo">
+        MEGA <span>AI</span>
+    </div>
+
+    <div class="version">
+        MEGA 1.0
+    </div>
+
+</header>
+
+
+<div class="container">
+
+<!-- =========================
+     TABS
+========================= -->
+
+<div class="tabs">
+
+<button class="active"
+onclick="openTab('chatPanel',this)">
+🤖 Chat
+</button>
+
+<button onclick="openTab('voicePanel',this)">
+🎤 Ovoz
+</button>
+
+<button onclick="openTab('imagePanel',this)">
+🖼️ Rasm
+</button>
+
+<button onclick="openTab('videoPanel',this)">
+🎬 Video
+</button>
+
+<button onclick="openTab('gamePanel',this)">
+🎮 O‘yin
+</button>
+
+<button onclick="openTab('codePanel',this)">
+💻 Kod
+</button>
+
+<button onclick="openTab('filePanel',this)">
+📁 Fayl
+</button>
+
+</div>
+
+
+<!-- =========================
+     CHAT
+========================= -->
+
+<section id="chatPanel" class="panel active">
+
+<div class="card">
+
+<h2>MEGA AI</h2>
+
+<div id="messages">
+
+<div class="message ai">
+Salom! Men MEGA AI 1.0.
+
+Sizga nimada yordam bera olaman?
+</div>
+
+</div>
+
+
+<div class="chatbox">
+
+<input
+id="chatInput"
+placeholder="MEGA AI ga xabar yuboring..."
+onkeydown="if(event.key==='Enter')sendMessage()">
+
+<button class="send"
+onclick="sendMessage()">
+➤
+</button>
+
+</div>
+
+
+<div class="quick">
+
+<button class="secondary"
+onclick="quick('Menga dasturlashni o‘rgat')">
+💻 Dasturlash
+</button>
+
+<button class="secondary"
+onclick="quick('Menga o‘yin yaratishga yordam ber')">
+🎮 O‘yin
+</button>
+
+<button class="secondary"
+onclick="quick('Menga ingliz tilini o‘rgat')">
+📚 Ta’lim
+</button>
+
+</div>
+
+</div>
+
+</section>
+
+
+<!-- =========================
+     VOICE
+========================= -->
+
+<section id="voicePanel" class="panel">
+
+<div class="card">
+
+<h2>🎤 Ovozli MEGA AI</h2>
+
+<p>
+MEGA AI bilan ovoz orqali suhbatlashing.
+</p>
+
+<button class="primary"
+onclick="startVoice()">
+🎙️ Gapirish
+</button>
+
+<div id="voiceStatus"
+class="status">
+Mikrofon tayyor.
+</div>
+
+</div>
+
+</section>
+
+
+<!-- =========================
+     IMAGE
+========================= -->
+
+<section id="imagePanel" class="panel">
+
+<div class="card">
+
+<h2>🖼️ AI Rasm</h2>
+
+<textarea
+id="imagePrompt"
+placeholder="Qanday rasm yaratilsin?">
+</textarea>
+
+<button class="primary"
+onclick="generateImage()">
+✨ Rasm yaratish
+</button>
+
+<div
+id="imageResult"
+class="status">
+</div>
+
+</div>
+
+</section>
+
+
+<!-- =========================
+     VIDEO
+========================= -->
+
+<section id="videoPanel" class="panel">
+
+<div class="card">
+
+<h2>🎬 AI Video</h2>
+
+<textarea
+id="videoPrompt"
+placeholder="Videoning g‘oyasini yozing...">
+</textarea>
+
+<button class="primary"
+onclick="generateVideo()">
+🎬 Video yaratish
+</button>
+
+<div id="videoResult"></div>
+
+<video id="videoPlayer"
+controls
+style="width:100%;border-radius:12px;margin-top:12px;display:none">
+</video>
+
+</div>
+
+</section>
+
+
+<!-- =========================
+     GAME
+========================= -->
+
+<section id="gamePanel" class="panel">
+
+<div class="card">
+
+<h2>🎮 AI Game Creator</h2>
+
+<textarea
+id="gamePrompt"
+placeholder="Qanday o‘yin yaratilsin?">
+</textarea>
+
+<button class="primary"
+onclick="generateGame()">
+🎮 O‘yin yaratish
+</button>
+
+<div id="gameResult"></div>
+
+</div>
+
+</section>
+
+
+<!-- =========================
+     CODE
+========================= -->
+
+<section id="codePanel" class="panel">
+
+<div class="card">
+
+<h2>💻 AI Code</h2>
+
+<textarea
+id="codePrompt"
+placeholder="Qanday kod kerak?">
+</textarea>
+
+<button class="primary"
+onclick="generateCode()">
+⚡ Kod yaratish
+</button>
+
+<pre id="codeResult"></pre>
+
+</div>
+
+</section>
+
+
+<!-- =========================
+     FILE
+========================= -->
+
+<section id="filePanel" class="panel">
+
+<div class="card">
+
+<h2>📁 Fayllar</h2>
+
+<input
+type="file"
+id="fileInput"
+onchange="readFile(this)">
+
+<div id="fileStatus"
+class="status">
+Fayl tanlanmagan.
+</div>
+
+</div>
+
+</section>
+
+</div>
+
+
+<footer>
+MEGA AI 1.0 • Single File
+</footer>
+
+
+
+<script>
+
+/* =========================
+   TABLAR
+========================= */
+
+function openTab(id,button){
+
+    document
+    .querySelectorAll(".panel")
+    .forEach(p=>p.classList.remove("active"));
+
+    document
+    .getElementById(id)
+    .classList.add("active");
+
+    document
+    .querySelectorAll(".tabs button")
+    .forEach(b=>b.classList.remove("active"));
+
+    button.classList.add("active");
+}
+
+
+/* =========================
+   AI ULANISHI (sample capability)
+========================= */
+
+let sampleAI=null;
+let aiReady=false;
+
+(async function initAI(){
+
+    try{
+
+        sampleAI=await claude.use("sample");
+
+        aiReady=!!sampleAI;
+
+    }catch(e){
+
+        aiReady=false;
+    }
+
+    if(!aiReady){
+
+        document.getElementById("voiceStatus")
+        ?.setAttribute("data-ai","off");
+    }
+
+})();
+
+
+/* =========================
+   CHAT
+========================= */
+
+let chatHistory=[];
+
+function addMessage(text,type){
+
+    const box=document.getElementById("messages");
+
+    const message=document.createElement("div");
+
+    message.className="message "+type;
+
+    message.textContent=text;
+
+    box.appendChild(message);
+
+    box.scrollTop=box.scrollHeight;
+
+    return message;
+}
+
+
+function quick(text){
+
+    document.getElementById("chatInput").value=text;
+
+    sendMessage();
+}
+
+
+async function sendMessage(){
+
+    const input=document.getElementById("chatInput");
+
+    const text=input.value.trim();
+
+    if(!text)return;
+
+    addMessage(text,"user");
+
+    input.value="";
+
+    chatHistory.push({role:"user",content:text});
+
+    if(chatHistory.length>20){
+        chatHistory=chatHistory.slice(-20);
+    }
+
+    if(!aiReady){
+
+        addMessage(
+            "AI ulanishi bu ko‘rinishda mavjud emas (sample ruxsati yo‘q).",
+            "ai"
+        );
+
+        return;
+    }
+
+    const thinkingMsg=addMessage("...","ai");
+
+    try{
+
+        const result=await sampleAI(chatHistory,{
+            onText:({text})=>{
+                thinkingMsg.textContent=text;
+                document.getElementById("messages").scrollTop=
+                    document.getElementById("messages").scrollHeight;
+            }
+        });
+
+        thinkingMsg.textContent=result.text;
+
+        chatHistory.push({role:"assistant",content:result.text});
+
+    }catch(err){
+
+        thinkingMsg.textContent=
+            "Xatolik: javob olinmadi ("+(err?.code||"noma’lum")+").";
+    }
+}
+
+
+/* =========================
+   OVOZ
+========================= */
+
+function startVoice(){
+
+    const SpeechRecognition =
+        window.SpeechRecognition ||
+        window.webkitSpeechRecognition;
+
+    if(!SpeechRecognition){
+
+        document.getElementById("voiceStatus")
+        .textContent=
+        "Brauzeringiz ovoz aniqlashni qo‘llab-quvvatlamaydi.";
+
+        return;
+    }
+
+
+    const recognition =
+        new SpeechRecognition();
+
+    recognition.lang="uz-UZ";
+
+    recognition.start();
+
+
+    document.getElementById("voiceStatus")
+    .textContent=
+    "🎙️ Tinglayapman...";
+
+
+    recognition.onresult=function(event){
+
+        const text =
+        event.results[0][0].transcript;
+
+
+        document.getElementById("voiceStatus")
+        .textContent=
+        "Siz: "+text;
+
+
+        document.getElementById("chatInput")
+        .value=text;
+
+
+        document
+        .querySelector(".tabs button")
+        .click();
+
+
+        sendMessage();
+    };
+
+    recognition.onerror=function(){
+
+        document.getElementById("voiceStatus")
+        .textContent=
+        "Xatolik yuz berdi. Qaytadan urinib ko‘ring.";
+    };
+}
+
+
+/* =========================
+   RASM
+========================= */
+
+async function askAI(container,prompt,systemHint){
+
+    if(!prompt)return;
+
+    container.innerHTML=
+    "<span class='status'>⏳ AI javob tayyorlayapti...</span>";
+
+    if(!aiReady){
+
+        container.innerHTML=
+        "<span class='status'>AI ulanishi mavjud emas.</span>";
+
+        return;
+    }
+
+    try{
+
+        const result=await sampleAI(
+            [{role:"user",content:systemHint+"\n\n"+prompt}],
+            {
+                onText:({text})=>{
+                    container.innerHTML=
+                    "<pre>"+escapeHTML(text)+"</pre>";
+                }
+            }
+        );
+
+        container.innerHTML=
+        "<pre>"+escapeHTML(result.text)+"</pre>";
+
+    }catch(err){
+
+        container.innerHTML=
+        "<span class='status'>Xatolik: "+
+        escapeHTML(String(err?.code||err?.message||"noma’lum"))+
+        "</span>";
+    }
+}
+
+
+/* =========================
+   RASM
+========================= */
+
+async function generateImage(){
+
+    const prompt =
+    document.getElementById("imagePrompt")
+    .value.trim();
+
+    const box=document.getElementById("imageResult");
+
+    if(!prompt)return;
+
+    box.innerHTML=
+    "<span class='status'>⏳ Tasvir uchun batafsil prompt yozilmoqda...</span>";
+
+    if(!aiReady){
+
+        box.innerHTML=
+        "<span class='status'>AI ulanishi mavjud emas.</span>";
+
+        return;
+    }
+
+    try{
+
+        const result=await sampleAI([{
+            role:"user",
+            content:
+            "Foydalanuvchi shu rasmni tasvirlab berdi: \""+prompt+
+            "\". Buni professional rasm-generatsiya prompti (masalan Midjourney/DALLE uchun) sifatida, ingliz tilida, batafsil yoz. Faqat promptni qaytar."
+        }]);
+
+        box.innerHTML=
+        "✨ Tayyor prompt (haqiqiy rasm chizish uchun rasm-generatsiya xizmatiga joylashtiring):<br><br><pre>"+
+        escapeHTML(result.text)+
+        "</pre><div class='status'>Eslatma: bu MEGA AI 1.0 hozircha rasmning o‘zini chizmaydi — faqat promptni tayyorlaydi.</div>";
+
+    }catch(err){
+
+        box.innerHTML=
+        "<span class='status'>Xatolik yuz berdi.</span>";
+    }
+}
+
+
+/* =========================
+   VIDEO
+========================= */
+
+const VIDEO_BACKEND_URL = ""; // bo'sh — chunki sahifa endi backend bilan bir domenda
+
+async function generateVideo(){
+
+    const prompt=document.getElementById("videoPrompt").value.trim();
+
+    const box=document.getElementById("videoResult");
+    const player=document.getElementById("videoPlayer");
+
+    if(!prompt)return;
+
+    player.style.display="none";
+    box.innerHTML="<span class='status'>⏳ Video so‘rovi yuborilmoqda...</span>";
+
+    try{
+
+        const startRes=await fetch(VIDEO_BACKEND_URL+"/api/generate-video",{
+            method:"POST",
+            headers:{"Content-Type":"application/json"},
+            body:JSON.stringify({prompt})
+        });
+
+        const startData=await startRes.json();
+
+        if(!startRes.ok){
+            box.innerHTML=
+            "<span class='status'>Xatolik: "+
+            escapeHTML(startData.error||"noma’lum")+
+            "</span>";
+            return;
+        }
+
+        const taskId=startData.taskId;
+
+        box.innerHTML=
+        "<span class='status'>⏳ Video yaratilmoqda... Bu bir necha daqiqa vaqt olishi mumkin.</span>";
+
+        pollVideoStatus(taskId,box,player);
+
+    }catch(err){
+
+        box.innerHTML=
+        "<span class='status'>Xatolik: server bilan bog‘lanib bo‘lmadi.</span>";
+    }
+}
+
+
+async function pollVideoStatus(taskId,box,player){
+
+    try{
+
+        const res=await fetch(VIDEO_BACKEND_URL+"/api/video-status?taskId="+taskId);
+
+        const data=await res.json();
+
+        if(!res.ok){
+            box.innerHTML=
+            "<span class='status'>Xatolik: "+
+            escapeHTML(data.error||"noma’lum")+
+            "</span>";
+            return;
+        }
+
+        if(data.status==="SUCCEEDED"){
+
+            box.innerHTML="<span class='status'>✅ Video tayyor!</span>";
+
+            player.src=data.videoUrl;
+            player.style.display="block";
+
+        }else if(data.status==="FAILED"){
+
+            box.innerHTML=
+            "<span class='status'>Video yaratib bo‘lmadi: "+
+            escapeHTML(JSON.stringify(data.failure||"noma’lum sabab"))+
+            "</span>";
+
+        }else{
+
+            box.innerHTML=
+            "<span class='status'>⏳ Holat: "+escapeHTML(data.status)+
+            " — kutilmoqda...</span>";
+
+            setTimeout(()=>pollVideoStatus(taskId,box,player),5000);
+        }
+
+    }catch(err){
+
+        box.innerHTML=
+        "<span class='status'>Xatolik: holatni tekshirib bo‘lmadi.</span>";
+    }
+}
+
+
+/* =========================
+   O‘YIN
+========================= */
+
+function generateGame(){
+
+    const prompt=document.getElementById("gamePrompt").value.trim();
+
+    askAI(
+        document.getElementById("gameResult"),
+        prompt,
+        "Sen o‘yin dizayneri va JavaScript dasturchisisan. Quyidagi g‘oya asosida oddiy brauzer o‘yinining dizayn hujjatini (mexanika, obyektlar, boshqaruv) va agar mumkin bo‘lsa qisqa HTML5 Canvas kod namunasini yoz, o‘zbek tilida tushuntirish bilan."
+    );
+}
+
+
+/* =========================
+   KOD
+========================= */
+
+function generateCode(){
+
+    const prompt=document.getElementById("codePrompt").value.trim();
+
+    askAI(
+        document.getElementById("codeResult"),
+        prompt,
+        "Sen dasturchisisan. Quyidagi so‘rov bo‘yicha toza, ishlaydigan kod yoz. Kod ustiga qisqa izoh (qaysi tilda, qanday ishlatiladi) qo‘sh."
+    );
+}
+
+
+/* =========================
+   FAYL
+========================= */
+
+function readFile(input){
+
+    const file=input.files[0];
+
+    if(!file)return;
+
+
+    document.getElementById("fileStatus")
+    .textContent=
+    file.name+
+    " • "+
+    file.size+
+    " bytes";
+}
+
+
+/* =========================
+   XAVFSIZ MATN
+========================= */
+
+function escapeHTML(text){
+
+    return text.replace(
+        /[&<>"']/g,
+        function(c){
+
+            return {
+                "&":"&amp;",
+                "<":"&lt;",
+                ">":"&gt;",
+                '"':"&quot;",
+                "'":"&#039;"
+            }[c];
+
+        }
+    );
+}
+
+</script>
+
+</body>
+</html>

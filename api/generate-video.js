@@ -1,3 +1,4 @@
+
 export default async function handler(req, res) {
 
     if (req.method !== "POST") {
@@ -23,7 +24,9 @@ export default async function handler(req, res) {
         const body = {
             model: "gen4_turbo",
             promptText: prompt,
-            promptImage: imageUrl || "https://picsum.photos/1280/768"
+            promptImage: imageUrl || "https://picsum.photos/1280/768",
+            ratio: "1280:720",
+            duration: 5
         };
 
         const runwayRes = await fetch(`${RUNWAY_BASE}/image_to_video`, {
@@ -40,13 +43,4 @@ export default async function handler(req, res) {
 
         if (!runwayRes.ok) {
             return res.status(runwayRes.status).json({
-                error: data?.error || "Runway so'rovi muvaffaqiyatsiz"
-            });
-        }
-
-        res.status(200).json({ taskId: data.id });
-
-    } catch (err) {
-        res.status(500).json({ error: "Server xatoligi: " + err.message });
-    }
-        }
+                error: data?.error || "Runway so'rovi muvaffaqiyats

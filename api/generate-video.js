@@ -10,42 +10,52 @@ export default async function handler(req, res) {
         return res.status(400).json({ error: "prompt majburiy" });
     }
 
-    const RUNWAY_API_KEY = process.env.RUNWAY_API_KEY;
-    const RUNWAY_VERSION = "2024-11-06";
-    const RUNWAY_BASE = "https://api.dev.runwayml.com/v1";
+    const HF_TOKEN = process.env.HF_API_TOKEN;
 
-    if (!RUNWAY_API_KEY) {
-        return res.status(500).json({ error: "RUNWAY_API_KEY sozlanmagan" });
+    if (!HF_TOKEN) {
+        return res.status(500).json({ error: "HF_API_TOKEN sozlanmagan" });
     }
+
+    const MODEL = "damo-vilab/text-to-video-ms-1.7b";
+    const url = `https://api-inference.huggingface.co/models/${MODEL}`;
 
     try {
 
-        const body = {
-            model: "gen4.5",
-            promptText: prompt,
-            ratio: "1280:720",
-            duration: 5
-        };
+        let response;
+        let attempt = 0;
 
-        const runwayRes = await fetch(`${RUNWAY_BASE}/text_to_video`, {
-            method: "POST",
-            headers: {
-                "Authorization": `Bearer ${RUNWAY_API_KEY}`,
-                "X-Runway-Version": RUNWAY_VERSION,
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(body)
-        });
+        while (attempt < 4) {
 
-        const data = await runwayRes.json();
-
-        if (!runwayRes.ok) {
-            return res.status(runwayRes.status).json({
-                error: data?.error || "Runway so'rovi muvaffaqiyatsiz"
+            response = await fetch(url, {
+                method: "POST",
+                headers: {
+                    "Authorization": `Bearer ${HF_TOKEN}`,
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ inputs: prompt })
             });
+
+            if (response.status === 503) {
+                const data = await response.json().catch(() => ({}));
+                const wait = Math.min(Math.ceil(data.estimated_time || 20), 60);
+                await new Promise(r => setTimeout(r, wait * 1000));
+                attempt++;
+                continue;
+            }
+
+            break;
         }
 
-        res.status(200).json({ taskId: data.id });
+        if (!response.ok) {
+            const errText = await response.text();
+            return res.status(response.status).json({ error: errText || "Hugging Face xatoligi" });
+        }
+
+        const arrayBuffer = await response.arrayBuffer();
+        const base64 = Buffer.from(arrayBuffer).toString("base64");
+        const dataUri = `data:video/mp4;base64,${base64}`;
+
+        res.status(200).json({ videoUrl: dataUri });
 
     } catch (err) {
         res.status(500).json({ error: "Server xatoligi: " + err.message });
